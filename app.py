@@ -1049,7 +1049,10 @@ def create_app(test_config: dict | None = None) -> Flask:
                         "UPDATE web_accounts SET wallet_user_id=? WHERE id=?",
                         (wallet_id, account_id),
                     )
-                    conn.execute("INSERT OR IGNORE INTO users(id) VALUES(?)", (wallet_id,))
+                    conn.execute(
+                        "INSERT OR IGNORE INTO users(user_id, created_at) VALUES(?, ?)",
+                        (wallet_id, int(datetime.now(timezone.utc).timestamp())),
+                    )
         except sqlite3.IntegrityError:
             flash("Email này đã được đăng ký.", "error")
             return redirect(url_for("register"))
@@ -1348,6 +1351,8 @@ def init_schema(path: str) -> None:
             conn.execute(
                 "ALTER TABLE orders ADD COLUMN source TEXT NOT NULL DEFAULT 'telegram'"
             )
+        if "qcst_order_id" not in order_columns:
+            conn.execute("ALTER TABLE orders ADD COLUMN qcst_order_id TEXT")
         user_columns = {
             row["name"] for row in conn.execute("PRAGMA table_info(users)")
         }
@@ -2293,6 +2298,9 @@ def topup_method_label(method: str) -> str:
         "card": "Thẻ cào / PPay",
     }.get(method, method)
 
+
+# Create app instance for WSGI servers
+app = create_app()
 
 if __name__ == "__main__":
     app = create_app()
