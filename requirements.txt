@@ -2,3 +2,4 @@ Flask>=3.0,<4
 cryptography>=42
 httpx>=0.27
 waitress>=3.0
+python-dotenv
