@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Notifications | ZenLig AI{% endblock %}
+{% block content %}
+  <section class="section-heading">
+    <div><p class="eyebrow">SETTINGS</p><h1>Cài đặt thông báo</h1></div>
+  </section>
+  <section class="panel">
+    <h2>Tùy chọn nhận thông báo</h2>
+    <p class="muted">Chọn loại thông báo bạn muốn nhận qua Telegram bot. Các thông báo chỉ hoạt động khi bot và hệ thống có sự kiện tương ứng.</p>
+    <form method="post" action="{{ url_for('update_notifications') }}" class="stack">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label class="checkbox-label">
+        <input type="checkbox" name="restock" {% if settings.restock %}checked{% endif %}>
+        <span><strong>Sản phẩm có hàng trở lại</strong> — Thông báo khi sản phẩm hết hàng được nhập lại</span>
+      </label>
+      <label class="checkbox-label">
+        <input type="checkbox" name="new_product" {% if settings.new_product %}checked{% endif %}>
+        <span><strong>Sản phẩm mới</strong> — Thông báo khi có sản phẩm mới được thêm vào</span>
+      </label>
+      <label class="checkbox-label">
+        <input type="checkbox" name="buyer" {% if settings.buyer %}checked{% endif %}>
+        <span><strong>Cập nhật đơn hàng</strong> — Thông báo về trạng thái đơn hàng và giao hàng</span>
+      </label>
+      <label class="checkbox-label">
+        <input type="checkbox" name="review" {% if settings.review %}checked{% endif %}>
+        <span><strong>Yêu cầu đánh giá</strong> — Nhắc đánh giá sau khi hoàn tất đơn hàng</span>
+      </label>
+      <label class="checkbox-label">
+        <input type="checkbox" name="giveaway" {% if settings.giveaway %}checked{% endif %}>
+        <span><strong>Giveaway</strong> — Thông báo về chương trình tặng quà và sự kiện</span>
+      </label>
+      <label class="checkbox-label">
+        <input type="checkbox" name="coupon" {% if settings.coupon %}checked{% endif %}>
+        <span><strong>Coupon và khuyến mãi</strong> — Thông báo khi có mã giảm giá mới</span>
+      </label>
+      <label class="checkbox-label">
+        <input type="checkbox" name="flash_sale" {% if settings.flash_sale %}checked{% endif %}>
+        <span><strong>Flash sale</strong> — Thông báo giảm giá nhanh có thời hạn</span>
+      </label>
+      <button class="button" type="submit">Lưu cài đặt</button>
+    </form>
+  </section>
+{% endblock %}

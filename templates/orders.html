@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Đơn hàng | ZenLig AI{% endblock %}
+{% block content %}
+  <div class="section-heading"><div><p class="eyebrow">PURCHASES</p><h1>Lịch sử đơn hàng</h1></div></div>
+  {% if orders %}
+    <div class="table-wrap"><table>
+      <thead><tr><th>Đơn</th><th>Sản phẩm</th><th>Số lượng</th><th>Tổng</th><th>Trạng thái</th><th>Ngày</th></tr></thead>
+      <tbody>{% for order in orders %}
+        <tr>
+          <td>#{{ order.id }}</td><td>{{ order.product_name }}</td><td>{{ order.qty }}</td>
+          <td>{{ money(order.total) }}</td><td><span class="status {{ order.status }}">{{ order.status }}</span></td>
+          <td>{{ order.created_at|datetime }}</td>
+        </tr>
+        {% if order.delivery %}<tr class="delivery-row"><td colspan="6"><strong>Thông tin giao hàng</strong><pre>{{ order.delivery|json_pretty }}</pre></td></tr>{% endif %}
+      {% endfor %}</tbody>
+    </table></div>
+  {% else %}<div class="empty-state">Bạn chưa có đơn hàng nào.</div>{% endif %}
+{% endblock %}

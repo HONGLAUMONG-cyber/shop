@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Coupon | ZenLig AI{% endblock %}
+{% block content %}
+  <section class="section-heading">
+    <div><p class="eyebrow">COUPON</p><h1>Gửi mã giảm giá</h1></div>
+  </section>
+  <section class="panel">
+    <h2>Gửi mã coupon mới</h2>
+    <p class="muted">Nhập mã coupon bạn có. Admin sẽ xem xét và cộng số dư hoặc giảm giá cho đơn hàng kế tiếp.</p>
+    <form method="post" action="{{ url_for('submit_coupon') }}" class="stack">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label>Mã coupon<input name="code" maxlength="50" placeholder="VD: ZENLIG2024" required></label>
+      <button class="button" type="submit">Gửi yêu cầu</button>
+    </form>
+  </section>
+  <section class="section-heading compact"><div><h2>Yêu cầu của bạn</h2></div></section>
+  {% if coupons %}
+    <div class="table-wrap"><table>
+      <thead><tr><th>Mã</th><th>Trạng thái</th><th>Ngày gửi</th></tr></thead>
+      <tbody>{% for coupon in coupons %}
+        <tr>
+          <td><strong>{{ coupon.code }}</strong></td>
+          <td><span class="status {{ coupon.status }}">{{ coupon.status }}</span></td>
+          <td>{{ coupon.created_at|datetime }}</td>
+        </tr>
+      {% endfor %}</tbody>
+    </table></div>
+  {% else %}
+    <div class="empty-state">Bạn chưa gửi mã coupon nào.</div>
+  {% endif %}
+{% endblock %}

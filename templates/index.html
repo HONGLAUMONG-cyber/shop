@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}ZenLig AI | Shop{% endblock %}
+{% block content %}
+  <section class="hero">
+    <p class="eyebrow">AI · MMO · PREMIUM</p>
+    <h1>{{ tr('catalog.hero_title_1') }},<br><span>{{ tr('catalog.hero_title_2') }}</span></h1>
+    <p>{{ tr('catalog.hero_subtitle') }}</p>
+    {% if not current_account %}<a class="button" href="{{ url_for('login') }}">{{ tr('catalog.hero_cta') }}</a>{% endif %}
+  </section>
+
+  <form method="get" action="{{ url_for('index') }}" class="catalog-filters">
+    <input type="search" name="q" value="{{ query }}" placeholder="{{ tr('catalog.search_placeholder') }}">
+    <select name="category">
+      <option value="">{{ tr('catalog.all_categories') }}</option>
+      {% for cat in categories %}
+        <option value="{{ cat }}" {% if cat == category_filter %}selected{% endif %}>
+          {{ tr('category.' + cat) }}
+        </option>
+      {% endfor %}
+    </select>
+    <button type="submit" class="button small">{{ tr('catalog.filter') }}</button>
+  </form>
+
+  <section class="section-heading">
+    <div><p class="eyebrow">ZENLIG CATALOG</p><h2>{{ tr('catalog.heading') }}</h2></div>
+    {% if current_account %}<a href="{{ url_for('topups') }}">{{ tr('catalog.topup_link') }} →</a>{% endif %}
+  </section>
+  {% if products %}
+    <div class="product-grid">
+      {% for product in products %}
+        {% set available = product_available(product) %}
+        {% set stock = product_stock(product) %}
+        <article class="product-card {% if not available %}sold-out{% endif %}">
+          <div class="product-icon">✦</div>
+          <p class="eyebrow">{{ tr('category.' + product_category(product)) }}</p>
+          <h3>{{ product_name(product) or tr('catalog.default_name') }}</h3>
+          {% if product_description(product) %}
+            <p class="muted">{{ product_description(product)|striptags|truncate(140) }}</p>
+          {% endif %}
+          <div class="product-meta">
+            <strong>{{ money(price_for(product)) }}</strong>
+            {% if not available %}
+              <span class="status">{{ tr('catalog.sold_out') }}</span>
+            {% elif stock is not none and stock > 0 %}
+              <span>{{ tr('catalog.in_stock', count=stock) }}</span>
+            {% else %}
+              <span>{{ tr('catalog.available') }}</span>
+            {% endif %}
+          </div>
+          {% if current_account and available %}
+            <a class="button full" href="{{ url_for('product_page', product_id=product.id) }}">
+              {{ tr('catalog.view_product') }}
+            </a>
+          {% elif current_account %}
+            <button class="button secondary full" disabled>{{ tr('catalog.sold_out') }}</button>
+          {% else %}
+            <a class="button secondary full" href="{{ url_for('login') }}">{{ tr('catalog.login_to_buy') }}</a>
+          {% endif %}
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">{{ tr('catalog.empty') }}</div>
+  {% endif %}
+{% endblock %}

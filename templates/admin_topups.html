@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Quản trị nạp tiền | ZenLig AI{% endblock %}
+{% block content %}
+  <div class="section-heading"><div><p class="eyebrow">ADMIN</p><h1>Yêu cầu nạp tiền</h1></div></div>
+  {% if topups %}
+    <div class="table-wrap"><table>
+      <thead><tr><th>#</th><th>User ID</th><th>Phương thức</th><th>Số tiền</th><th>Trạng thái / dữ liệu</th><th>Thao tác</th></tr></thead>
+      <tbody>{% for item in topups %}
+        <tr>
+          <td>{{ item.id }}</td><td>{{ item.user_id }}</td><td>{{ item.method|topup_method }}</td>
+          <td>{{ money(item.amount) }}</td>
+          <td><span class="status {{ item.status }}">{{ item.status }}</span>
+            {% if item.txid %}<br><code class="break">{{ item.txid }}</code>{% endif %}
+            {% if item.method == 'card' %}<br>{{ item.card_type }} / {{ money(item.denomination) }}{% endif %}
+          </td>
+          <td class="actions">
+            {% if item.method == 'card' and item.status == 'awaiting_amount' %}
+              <form method="post" action="{{ url_for('set_card_amount', topup_id=item.id) }}" class="inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="number" name="amount" min="1" max="{{ item.denomination }}" placeholder="Thực nhận" required>
+                <button class="button small" type="submit">Lưu tiền</button>
+              </form>
+            {% endif %}
+            {% if item.status in ['notified','verified'] %}
+              <form method="post" action="{{ url_for('approve_topup', topup_id=item.id) }}" class="inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button class="button small" type="submit">Duyệt</button>
+              </form>
+            {% endif %}
+            {% if item.status in ['pending','notified','submitting','processing','awaiting_amount','verified'] %}
+              <form method="post" action="{{ url_for('reject_topup_route', topup_id=item.id) }}" class="inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button class="button danger small" type="submit">Từ chối</button>
+              </form>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}</tbody>
+    </table></div>
+  {% else %}<div class="empty-state">Không có yêu cầu đang chờ.</div>{% endif %}
+{% endblock %}

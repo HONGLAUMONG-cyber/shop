@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Admin Coupons | ZenLig AI{% endblock %}
+{% block content %}
+  <section class="section-heading">
+    <div><p class="eyebrow">ADMIN</p><h1>Quản lý Coupon</h1></div>
+  </section>
+  <section class="section-heading compact"><div><h2>Chờ duyệt ({{ pending|length }})</h2></div></section>
+  {% if pending %}
+    <div class="table-wrap"><table>
+      <thead><tr><th>User ID</th><th>Mã</th><th>Ngày gửi</th><th>Hành động</th></tr></thead>
+      <tbody>{% for coupon in pending %}
+        <tr>
+          <td><strong>{{ coupon.telegram_id }}</strong></td>
+          <td>{{ coupon.code }}</td>
+          <td>{{ coupon.created_at|datetime }}</td>
+          <td>
+            <details class="coupon-actions">
+              <summary>Xử lý</summary>
+              <div class="action-forms">
+                <form method="post" action="{{ url_for('approve_coupon', coupon_id=coupon.id) }}" class="inline-form">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <input type="hidden" name="action" value="credit">
+                  <input type="number" name="amount" placeholder="Số tiền VND" required style="width:120px">
+                  <button class="button small" type="submit">Cộng số dư</button>
+                </form>
+                <form method="post" action="{{ url_for('approve_coupon', coupon_id=coupon.id) }}" class="inline-form">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <input type="hidden" name="action" value="discount">
+                  <input type="number" name="discount" placeholder="%" min="1" max="100" required style="width:60px">
+                  <button class="button small" type="submit">Giảm giá đơn sau</button>
+                </form>
+                <form method="post" action="{{ url_for('reject_coupon', coupon_id=coupon.id) }}" class="inline-form">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button class="button secondary small" type="submit">Từ chối</button>
+                </form>
+              </div>
+            </details>
+          </td>
+        </tr>
+      {% endfor %}</tbody>
+    </table></div>
+  {% else %}
+    <div class="empty-state">Không có coupon chờ duyệt.</div>
+  {% endif %}
+  <section class="section-heading compact"><div><h2>Đã xử lý gần đây</h2></div></section>
+  {% if recent %}
+    <div class="table-wrap"><table>
+      <thead><tr><th>User ID</th><th>Mã</th><th>Trạng thái</th><th>Ngày gửi</th></tr></thead>
+      <tbody>{% for coupon in recent %}
+        <tr>
+          <td>{{ coupon.telegram_id }}</td>
+          <td>{{ coupon.code }}</td>
+          <td><span class="status {{ coupon.status }}">{{ coupon.status }}</span></td>
+          <td>{{ coupon.created_at|datetime }}</td>
+        </tr>
+      {% endfor %}</tbody>
+    </table></div>
+  {% else %}
+    <div class="empty-state">Chưa có coupon nào được xử lý.</div>
+  {% endif %}
+{% endblock %}

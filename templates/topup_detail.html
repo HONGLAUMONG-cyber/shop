@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Yêu cầu nạp #{{ topup.id }} | ZenLig AI{% endblock %}
+{% block content %}
+  <section class="detail-card">
+    <p class="eyebrow">TOP-UP #{{ topup.id }}</p>
+    <h1>{{ topup.method|topup_method }}</h1>
+    <p>Số tiền quy đổi: <strong>{{ money(topup.amount) }}</strong></p>
+    <p>Trạng thái: <span class="status {{ topup.status }}">{{ topup.status }}</span></p>
+    {% if topup.method == 'bank' %}
+      <div class="payment-info">
+        <p>Ngân hàng: <strong>{{ config.BANK_CODE }}</strong></p>
+        <p>Số tài khoản: <strong>{{ config.BANK_ACCOUNT }}</strong></p>
+        <p>Chủ tài khoản: <strong>{{ config.ACCOUNT_NAME }}</strong></p>
+        <p>Số tiền: <strong>{{ topup.amount }}</strong></p>
+        <p>Nội dung chuyển khoản: <code>{{ topup.code }}</code></p>
+        <img class="qr" src="{{ qr_url }}" alt="Mã QR chuyển khoản">
+      </div>
+      {% if topup.status == 'pending' %}
+        <form method="post" action="{{ url_for('notify_topup_paid', topup_id=topup.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="button" type="submit">Tôi đã chuyển khoản</button>
+        </form>
+      {% endif %}
+    {% elif topup.method == 'usdt' %}
+      <div class="payment-info">
+        <p>Số USDT: <strong>{{ topup.usdt_amount }}</strong></p>
+        <p>Tỷ giá: 1 USDT = {{ money(config.USDT_VND_RATE|int) }}</p>
+        <p>Chỉ chuyển qua mạng TRON (TRC20):</p><code class="break">{{ config.USDT_TRC20_ADDRESS }}</code>
+        <p>Mã tham chiếu: <code>{{ topup.code }}</code></p>
+      </div>
+      {% if topup.status == 'pending' %}
+        <form method="post" action="{{ url_for('notify_topup_paid', topup_id=topup.id) }}" class="stack">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <label>TXID TRON (64 ký tự hex)<input name="txid" minlength="64" maxlength="64" required></label>
+          <button class="button" type="submit">Đã chuyển USDT</button>
+        </form>
+      {% endif %}
+    {% elif topup.method == 'card' %}
+      <p>Nhà mạng: {{ topup.card_type }} · Mệnh giá: {{ money(topup.denomination) }}</p>
+      <p>PPay sẽ xử lý thẻ. Số dư chỉ được cộng sau khi admin duyệt số tiền thực nhận.</p>
+    {% endif %}
+    <p class="muted">Số dư chỉ thay đổi sau khi admin xác nhận giao dịch.</p>
+  </section>
+{% endblock %}

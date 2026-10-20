@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Support | ZenLig AI{% endblock %}
+{% block content %}
+  <section class="section-heading">
+    <div><p class="eyebrow">SUPPORT</p><h1>Hỗ trợ khách hàng</h1></div>
+  </section>
+  <section class="panel">
+    <h2>Liên hệ hỗ trợ</h2>
+    <p class="muted">Nếu bạn cần trợ giúp về đơn hàng, thanh toán hoặc sản phẩm, vui lòng liên hệ qua Telegram:</p>
+    <div class="payment-info">
+      <p><strong>Telegram hỗ trợ:</strong></p>
+      <p><a href="https://t.me/honghnt2747" target="_blank" rel="noopener">@honghnt2747</a></p>
+    </div>
+    <p>Chúng tôi sẽ phản hồi yêu cầu của bạn trong thời gian sớm nhất.</p>
+  </section>
+  <section class="panel">
+    <h2>Các câu hỏi thường gặp</h2>
+    <details>
+      <summary><strong>Làm sao để nạp tiền?</strong></summary>
+      <p>Truy cập trang <a href="{{ url_for('topups') }}">Nạp tiền</a> và chọn phương thức phù hợp: chuyển khoản ngân hàng, USDT/TRC20, hoặc thẻ cào. Admin sẽ xác nhận và cộng số dư sau khi kiểm tra.</p>
+    </details>
+    <details>
+      <summary><strong>Tôi có thể liên kết tài khoản Telegram không?</strong></summary>
+      <p>Có, vào trang <a href="{{ url_for('account') }}">Tài khoản</a> và nhấn nút liên kết Telegram. Sau khi liên kết, số dư và lịch sử đơn hàng sẽ được gộp an toàn.</p>
+    </details>
+    <details>
+      <summary><strong>Coupon hoạt động như thế nào?</strong></summary>
+      <p>Gửi mã coupon tại trang <a href="{{ url_for('coupons') }}">Coupon</a>. Admin sẽ xem xét và cộng số dư hoặc giảm giá cho đơn hàng kế tiếp của bạn.</p>
+    </details>
+    <details>
+      <summary><strong>Chương trình giới thiệu là gì?</strong></summary>
+      <p>Liên kết Telegram để nhận link giới thiệu. Bạn sẽ nhận hoa hồng 2% từ đơn hàng của người được giới thiệu, và họ cũng nhận thưởng khi mua lần đầu!</p>
+    </details>
+  </section>
+{% endblock %}

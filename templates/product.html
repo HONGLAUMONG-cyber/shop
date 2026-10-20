@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}{{ product_name(product) }} | ZenLig AI{% endblock %}
+{% block content %}
+  <div class="breadcrumb"><a href="{{ url_for('index') }}">{{ tr('nav.products') }}</a> / {{ tr('product.detail') }}</div>
+  <section class="detail-card">
+    {% set available = product_available(product) %}
+    {% set stock = product_stock(product) %}
+    {% set manual = product.get('requires_manual_fulfillment') %}
+    <div class="product-icon large">✦</div>
+    <p class="eyebrow">{{ tr('category.' + product_category(product)) }}</p>
+    <h1>{{ product_name(product) }}</h1>
+    <p class="muted">{{ product_description(product)|striptags if product_description(product) else '' }}</p>
+    {% if product_warranty(product) %}
+      <p><strong>{{ tr('product.warranty') }}:</strong> {{ product_warranty(product)|striptags }}</p>
+    {% endif %}
+    <p>
+      <strong>{{ tr('product.status') }}:</strong>
+      {% if not available %}
+        {{ tr('catalog.sold_out') }}
+      {% elif stock is not none and stock > 0 %}
+        {{ tr('catalog.in_stock', count=stock) }}
+      {% else %}
+        {{ tr('catalog.available') }}
+      {% endif %}
+    </p>
+    {% if manual %}
+      <p class="notice">{{ tr('product.manual_fulfillment') }}</p>
+    {% endif %}
+    <p class="price">{{ money(price_for(product)) }} <span>/ {{ tr('product.unit') }}</span></p>
+    {% if not available %}
+      <p>{{ tr('product.unavailable_message') }}</p>
+    {% elif product.fixed_quantity %}
+      <p>{{ tr('product.fixed_quantity', qty=product.fixed_quantity) }}</p>
+      <form method="post" action="{{ url_for('create_order', product_id=product.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="quantity" value="{{ product.fixed_quantity }}">
+        <button class="button" type="submit">{{ tr('product.buy_now') }}</button>
+      </form>
+    {% else %}
+      <form method="post" action="{{ url_for('create_order', product_id=product.id) }}" class="buy-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label for="quantity">{{ tr('product.quantity') }}</label>
+        <input id="quantity" name="quantity" type="number" min="{{ product.min_quantity or 1 }}"
+          {% if product.max_quantity %}max="{{ product.max_quantity }}"{% endif %}
+          {% if stock is not none and stock > 0 %}max="{{ stock }}"{% endif %}
+          value="{{ product.min_quantity or 1 }}" required>
+        <button class="button" type="submit">{{ tr('product.buy_now') }}</button>
+      </form>
+    {% endif %}
+  </section>
+{% endblock %}

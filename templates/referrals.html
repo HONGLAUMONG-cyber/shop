@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Referrals | ZenLig AI{% endblock %}
+{% block content %}
+  <section class="section-heading">
+    <div><p class="eyebrow">REFERRALS</p><h1>Chương trình giới thiệu</h1></div>
+  </section>
+
+  {% if referral_code %}
+    <section class="panel">
+      <h2>Link giới thiệu của bạn</h2>
+      <p class="muted">Chia sẻ link này để nhận hoa hồng 2% từ đơn hàng của người được giới thiệu. Họ cũng nhận thưởng khi mua lần đầu!</p>
+      <div class="payment-info">
+        <p><strong>Link của bạn:</strong></p>
+        <p class="break">{{ request.url_root }}ref/{{ referral_code }}</p>
+      </div>
+      <p><strong>Đã giới thiệu:</strong> {{ referred_count }} người</p>
+      <p><strong>Tổng hoa hồng đã nhận:</strong> {{ money(total_commission) }}</p>
+      <p><strong>Tổng thưởng:</strong> {{ money(total_bonus) }}</p>
+    </section>
+  {% else %}
+    <section class="panel">
+      <h2>Link giới thiệu</h2>
+      <p class="muted">Liên kết tài khoản Telegram để nhận link giới thiệu và tham gia chương trình.</p>
+      <a class="button" href="{{ url_for('account') }}">Liên kết Telegram</a>
+    </section>
+  {% endif %}
+
+  {% if referrer_id %}
+    <section class="panel">
+      <p>Bạn được giới thiệu bởi user <strong>{{ referrer_id }}</strong>. Đơn hàng đầu tiên của bạn sẽ nhận thưởng!</p>
+    </section>
+  {% endif %}
+
+  <section class="section-heading compact"><div><h2>Lịch sử thưởng</h2></div></section>
+  {% if rewards %}
+    <div class="table-wrap"><table>
+      <thead><tr><th>Đơn hàng</th><th>Sản phẩm</th><th>Giá trị</th><th>Loại</th><th>Số tiền</th><th>Trạng thái</th><th>Ngày</th></tr></thead>
+      <tbody>{% for reward in rewards %}
+        <tr>
+          <td>#{{ reward.order_id }}</td>
+          <td>{{ reward.product_name }}</td>
+          <td>{{ money(reward.total) }}</td>
+          <td>
+            {% if reward.referrer_id == current_account.wallet_user_id %}
+              {% if reward.commission_amount > 0 %}Hoa hồng{% endif %}
+              {% if reward.referrer_bonus > 0 %}{{ '+' if reward.commission_amount > 0 }}Thưởng{% endif %}
+            {% else %}
+              Thưởng người được giới thiệu
+            {% endif %}
+          </td>
+          <td>
+            {% if reward.referrer_id == current_account.wallet_user_id %}
+              {{ money(reward.commission_amount + reward.referrer_bonus) }}
+            {% else %}
+              {{ money(reward.referred_bonus) }}
+            {% endif %}
+          </td>
+          <td><span class="status {{ reward.status }}">{{ reward.status }}</span></td>
+          <td>{{ reward.created_at|datetime }}</td>
+        </tr>
+      {% endfor %}</tbody>
+    </table></div>
+  {% else %}
+    <div class="empty-state">Chưa có thưởng giới thiệu nào.</div>
+  {% endif %}
+{% endblock %}

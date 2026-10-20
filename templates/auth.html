@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Đăng nhập' if mode == 'login' else 'Tạo tài khoản' }} | ZenLig AI{% endblock %}
+{% block content %}
+  <section class="auth-card">
+    <p class="eyebrow">ZENLIG ACCOUNT</p>
+    <h1>{{ 'Chào mừng trở lại' if mode == 'login' else 'Tạo tài khoản' }}</h1>
+    <p class="muted">Dùng tài khoản website hoặc đăng nhập bằng Telegram. Liên kết Telegram để dùng chung ví và lịch sử với bot.</p>
+    <form method="post" class="stack">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label>Email<input type="email" name="email" autocomplete="email" maxlength="254" required></label>
+      <label>Mật khẩu<input type="password" name="password" autocomplete="{{ 'current-password' if mode == 'login' else 'new-password' }}" minlength="10" required></label>
+      {% if mode == 'register' %}<small>Mật khẩu tối thiểu 10 ký tự.</small>{% endif %}
+      <button class="button full" type="submit">{{ 'Đăng nhập' if mode == 'login' else 'Đăng ký' }}</button>
+    </form>
+    <div class="divider"><span>hoặc</span></div>
+    <p class="muted center">Đăng nhập bằng Telegram</p>
+    <div class="telegram-widget">
+      <script async src="https://telegram.org/js/telegram-widget.js?22"
+        data-telegram-login="{{ config.TELEGRAM_BOT_USERNAME }}"
+        data-size="large" data-auth-url="{{ url_for('telegram_auth', state=session.get('telegram_state'), _external=True, _scheme='https') }}"
+        data-request-access="write"></script>
+    </div>
+    <p class="auth-switch">
+      {% if mode == 'login' %}Chưa có tài khoản? <a href="{{ url_for('register') }}">Đăng ký</a>
+      {% else %}Đã có tài khoản? <a href="{{ url_for('login') }}">Đăng nhập</a>{% endif %}
+    </p>
+  </section>
+{% endblock %}

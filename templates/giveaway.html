@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Giveaway | ZenLig AI{% endblock %}
+{% block content %}
+  <section class="section-heading">
+    <div><p class="eyebrow">GIVEAWAY</p><h1>Chương trình tặng quà</h1></div>
+  </section>
+  <section class="panel">
+    <h2>Hiện chưa có giveaway</h2>
+    <p class="muted">Chưa có chương trình tặng quà nào đang diễn ra. Theo dõi thông báo hoặc kênh Telegram của chúng tôi để không bỏ lỡ các sự kiện sắp tới!</p>
+    <p>Bật thông báo giveaway trong <a href="{{ url_for('notifications') }}">cài đặt thông báo</a> để nhận tin ngay khi có chương trình mới.</p>
+  </section>
+{% endblock %}

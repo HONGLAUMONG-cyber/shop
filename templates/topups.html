@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Nạp tiền | ZenLig AI{% endblock %}
+{% block content %}
+  <div class="section-heading"><div><p class="eyebrow">WALLET</p><h1>Nạp số dư</h1></div></div>
+  <div class="payment-grid">
+    <section class="panel">
+      <h2>Chuyển khoản ngân hàng</h2>
+      <p class="muted">Tạo yêu cầu, chuyển đúng số tiền và nội dung. Admin xác nhận trước khi cộng số dư.</p>
+      <form method="post" action="{{ url_for('create_bank_topup') }}" class="stack">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label>Số tiền VND<input name="amount" inputmode="numeric" placeholder="Ví dụ: 50000" required></label>
+        <button class="button" type="submit">Tạo mã chuyển khoản</button>
+      </form>
+    </section>
+    <section class="panel">
+      <h2>USDT / TRC20</h2>
+      <p class="muted">Nhập TXID sau khi chuyển. Admin kiểm tra giao dịch TRON trước khi duyệt.</p>
+      <form method="post" action="{{ url_for('create_usdt_topup') }}" class="stack">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label>Số USDT<input name="usdt_amount" inputmode="decimal" placeholder="Ví dụ: 10.5" required></label>
+        <button class="button" type="submit">Tạo yêu cầu USDT</button>
+      </form>
+    </section>
+    {% if config.get('PPAY_PARTNER_ID') and config.get('PPAY_PARTNER_KEY') and config.get('DOITHE_CARD_ENCRYPTION_KEY') %}
+    <section class="panel">
+      <h2>Thẻ cào qua PPay</h2>
+      <p class="muted">Chỉ gửi thẻ chưa sử dụng. Mã thẻ được mã hóa trước khi lưu; admin duyệt số tiền thực nhận.</p>
+      <form method="post" action="{{ url_for('create_card_topup') }}" class="stack">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label>Nhà mạng
+          <select name="card_type" required>
+            <option value="">Chọn nhà mạng/loại thẻ</option>
+            {% for value,label in card_types.items() %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
+          </select>
+        </label>
+        <label>Mệnh giá VND<input name="denomination" inputmode="numeric" required></label>
+        <label>Mã thẻ<input name="card_pin" autocomplete="off" required></label>
+        <label>Serial<input name="serial" autocomplete="off" required></label>
+        <button class="button" type="submit">Gửi thẻ tới PPay</button>
+      </form>
+    </section>
+    {% endif %}
+  </div>
+  <section class="section-heading compact"><div><h2>Yêu cầu gần đây</h2></div></section>
+  {% if topups %}
+    <div class="table-wrap"><table>
+      <thead><tr><th>Mã</th><th>Phương thức</th><th>Số tiền</th><th>Trạng thái</th><th></th></tr></thead>
+      <tbody>{% for item in topups %}
+        <tr><td>{{ item.code or ('#' ~ item.id) }}</td><td>{{ item.method|topup_method }}</td>
+        <td>{{ money(item.amount) }}</td><td><span class="status {{ item.status }}">{{ item.status }}</span></td>
+        <td><a href="{{ url_for('topup_detail', topup_id=item.id) }}">Chi tiết</a></td></tr>
+      {% endfor %}</tbody>
+    </table></div>
+  {% else %}<div class="empty-state">Chưa có yêu cầu nạp.</div>{% endif %}
+{% endblock %}

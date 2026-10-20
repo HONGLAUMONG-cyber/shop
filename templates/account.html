@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}{{ tr('account.title') }} | ZenLig AI{% endblock %}
+{% block content %}
+  <section class="section-heading">
+    <div><p class="eyebrow">ACCOUNT</p><h1>{{ tr('account.heading') }}</h1></div>
+  </section>
+  <div class="account-grid">
+    <section class="panel">
+      <h2>{{ tr('account.auth') }}</h2>
+      <p>{{ tr('account.email') }}: <strong>{{ current_account.email or tr('account.not_set') }}</strong></p>
+      <p>{{ tr('account.telegram') }}: <strong>{{ current_account.telegram_id or tr('account.not_linked') }}</strong></p>
+      <form method="post" action="{{ url_for('update_credentials') }}" class="stack">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label>{{ tr('account.new_email') }}<input type="email" name="email" maxlength="254" value="{{ current_account.email or '' }}"></label>
+        <label>{{ tr('account.new_password') }}<input type="password" name="password" minlength="10" autocomplete="new-password"></label>
+        <button class="button secondary" type="submit">{{ tr('account.save') }}</button>
+      </form>
+    </section>
+    <section class="panel">
+      <h2>{{ tr('account.language_heading') }}</h2>
+      <p>{{ tr('account.current_language') }}: <strong>{{ languages[current_language]['name'] }}</strong></p>
+      <form method="post" action="{{ url_for('change_language') }}" class="stack">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label>
+          {{ tr('account.select_language') }}
+          <select name="language">
+            {% for code, meta in languages.items() %}
+              <option value="{{ code }}" {% if code == current_language %}selected{% endif %}>
+                {{ meta['name'] }}
+              </option>
+            {% endfor %}
+          </select>
+        </label>
+        <button class="button secondary" type="submit">{{ tr('account.save') }}</button>
+      </form>
+    </section>
+  </div>
+  <div class="account-grid compact">
+    <section class="panel">
+      <h2>{{ tr('account.link_telegram') }}</h2>
+      {% if current_account.telegram_id %}
+        <p>{{ tr('account.telegram_linked') }}</p>
+      {% else %}
+        <p>{{ tr('account.link_telegram_note') }}</p>
+        <div class="telegram-widget">
+          <script async src="https://telegram.org/js/telegram-widget.js?22"
+            data-telegram-login="{{ config.TELEGRAM_BOT_USERNAME }}"
+            data-size="large" data-auth-url="{{ telegram_widget_url() }}"
+            data-request-access="write"></script>
+        </div>
+      {% endif %}
+    </section>
+  </div>
+{% endblock %}
